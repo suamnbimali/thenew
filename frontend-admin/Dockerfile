@@ -4,12 +4,12 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json ./
-# Use npm install instead of npm ci since package-lock.json doesn't exist
 RUN npm install
 
 # Builder stage
 FROM node:20-alpine AS builder
 WORKDIR /app
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -28,11 +28,16 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/public ./public
+# Set up directories
+RUN mkdir -p public
+RUN chown -R nextjs:nodejs /app
 
-# Set correct permissions for .next
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
+# Copy public directory (use wildcard to handle empty dirs)
+COPY --from=builder /app/public* ./ 2>/dev/null || true
+
+# Copy .next files
+RUN mkdir -p .next
+RUN chown -R nextjs:nodejs .next
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
