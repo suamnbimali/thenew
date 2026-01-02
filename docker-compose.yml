@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # PocketBase Backend Database
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    container_name: ndis-pocketbase
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./backend/pocketbase/pb_data:/pb_data
+      - ./backend/pocketbase/pb_public:/pb_public
+    environment:
+      - GO_ENV=production
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8090/api/health || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ndis-network
+
+  # SCHADS Award Engine
+  schads-engine:
+    build:
+      context: ./backend/python-services/schads-engine
+      dockerfile: Dockerfile
+    container_name: ndis-schads-engine
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+      - POCKETBASE_URL=http://pocketbase:8090
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    networks:
+      - ndis-network
+
+  # AI Matching Engine
+  matching-engine:
+    build:
+      context: ./backend/python-services/matching-engine
+      dockerfile: Dockerfile
+    container_name: ndis-matching-engine
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+      - POCKETBASE_URL=http://pocketbase:8090
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    networks:
+      - ndis-network
+
+  # Next.js Admin Frontend
+  frontend:
+    build:
+      context: ./frontend-admin
+      dockerfile: Dockerfile
+    container_name: ndis-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_POCKETBASE_URL=http://localhost:8090
+      - NEXT_PUBLIC_API_URL=http://localhost:8090
+    depends_on:
+      - pocketbase
+      - schads-engine
+      - matching-engine
+    networks:
+      - ndis-network
+
+networks:
+  ndis-network:
+    driver: bridge
+
+volumes:
+  pb_data:
