@@ -29,16 +29,11 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Set up directories
-RUN mkdir -p public
+RUN mkdir -p public .next
 RUN chown -R nextjs:nodejs /app
 
-# Copy public directory (use wildcard to handle empty dirs)
-COPY --from=builder /app/public* ./ 2>/dev/null || true
-
-# Copy .next files
-RUN mkdir -p .next
-RUN chown -R nextjs:nodejs .next
-
+# Copy files from builder
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public/
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
