@@ -1,0 +1,406 @@
+{
+  "collections": [
+    {
+      "name": "workers",
+      "type": "base",
+      "schema": [
+        {
+          "id": "worker_name",
+          "name": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "worker_email",
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "unique": true
+        },
+        {
+          "id": "worker_phone",
+          "name": "phone",
+          "type": "text"
+        },
+        {
+          "id": "worker_level",
+          "name": "worker_level",
+          "type": "number",
+          "required": true,
+          "options": {
+            "min": 1,
+            "max": 4
+          }
+        },
+        {
+          "id": "hourly_rate",
+          "name": "hourly_rate",
+          "type": "number",
+          "required": true
+        },
+        {
+          "id": "experience_hours",
+          "name": "experience_hours",
+          "type": "number",
+          "default": 0
+        },
+        {
+          "id": "location_lat",
+          "name": "location_lat",
+          "type": "number"
+        },
+        {
+          "id": "location_lng",
+          "name": "location_lng",
+          "type": "number"
+        },
+        {
+          "id": "available",
+          "name": "available",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "id": "certifications",
+          "name": "certifications",
+          "type": "json"
+        },
+        {
+          "id": "trainings",
+          "name": "trainings",
+          "type": "json"
+        },
+        {
+          "id": "business_id",
+          "name": "business_id",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "businesses"
+          }
+        }
+      ]
+    },
+    {
+      "name": "participants",
+      "type": "base",
+      "schema": [
+        {
+          "id": "participant_name",
+          "name": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "participant_dob",
+          "name": "date_of_birth",
+          "type": "date"
+        },
+        {
+          "id": "participant_ndis_number",
+          "name": "ndis_number",
+          "type": "text",
+          "unique": true
+        },
+        {
+          "id": "participant_funding",
+          "name": "funding_budget_total",
+          "type": "number",
+          "required": true
+        },
+        {
+          "id": "participant_spent",
+          "name": "funding_spent",
+          "type": "number",
+          "default": 0
+        },
+        {
+          "id": "location_lat",
+          "name": "location_lat",
+          "type": "number"
+        },
+        {
+          "id": "location_lng",
+          "name": "location_lng",
+          "type": "number"
+        },
+        {
+          "id": "care_requirements",
+          "name": "care_requirements",
+          "type": "json"
+        },
+        {
+          "id": "business_id",
+          "name": "business_id",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "businesses"
+          }
+        }
+      ]
+    },
+    {
+      "name": "shifts",
+      "type": "base",
+      "schema": [
+        {
+          "id": "shift_start",
+          "name": "start_time",
+          "type": "date",
+          "required": true
+        },
+        {
+          "id": "shift_end",
+          "name": "end_time",
+          "type": "date",
+          "required": true
+        },
+        {
+          "id": "shift_status",
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "options": {
+            "values": ["draft", "open", "assigned", "in_progress", "completed", "cancelled"]
+          }
+        },
+        {
+          "id": "shift_cost",
+          "name": "estimated_cost",
+          "type": "number"
+        },
+        {
+          "id": "participant_id",
+          "name": "participant_id",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "participants"
+          }
+        },
+        {
+          "id": "assigned_worker_id",
+          "name": "assigned_worker_id",
+          "type": "relation",
+          "options": {
+            "collectionId": "workers"
+          }
+        },
+        {
+          "id": "required_certifications",
+          "name": "required_certifications",
+          "type": "json"
+        },
+        {
+          "id": "required_trainings",
+          "name": "required_trainings",
+          "type": "json"
+        },
+        {
+          "id": "business_id",
+          "name": "business_id",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "businesses"
+          }
+        }
+      ]
+    },
+    {
+      "name": "certifications",
+      "type": "base",
+      "schema": [
+        {
+          "id": "cert_name",
+          "name": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "cert_code",
+          "name": "code",
+          "type": "text",
+          "unique": true
+        },
+        {
+          "id": "cert_description",
+          "name": "description",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "trainings",
+      "type": "base",
+      "schema": [
+        {
+          "id": "training_name",
+          "name": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "training_code",
+          "name": "code",
+          "type": "text",
+          "unique": true
+        },
+        {
+          "id": "training_description",
+          "name": "description",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "businesses",
+      "type": "base",
+      "schema": [
+        {
+          "id": "business_name",
+          "name": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "business_email",
+          "name": "email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "id": "business_phone",
+          "name": "phone",
+          "type": "text"
+        },
+        {
+          "id": "business_address",
+          "name": "address",
+          "type": "text"
+        },
+        {
+          "id": "business_abn",
+          "name": "abn",
+          "type": "text",
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "compliance_overrides",
+      "type": "base",
+      "schema": [
+        {
+          "id": "rule_name",
+          "name": "rule_name",
+          "type": "select",
+          "required": true,
+          "options": {
+            "values": [
+              "cert_expiry_block",
+              "training_incomplete_block",
+              "shift_conflict_block",
+              "negative_budget_block",
+              "schads_break_enforcement",
+              "max_distance_enforce"
+            ]
+          }
+        },
+        {
+          "id": "is_overridden",
+          "name": "is_overridden",
+          "type": "bool",
+          "required": true
+        },
+        {
+          "id": "override_reason",
+          "name": "override_reason",
+          "type": "text"
+        },
+        {
+          "id": "overridden_by",
+          "name": "overridden_by",
+          "type": "relation"
+        },
+        {
+          "id": "overridden_at",
+          "name": "overridden_at",
+          "type": "date"
+        },
+        {
+          "id": "expires_at",
+          "name": "expires_at",
+          "type": "date"
+        },
+        {
+          "id": "business_id",
+          "name": "business_id",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "businesses"
+          }
+        }
+      ]
+    },
+    {
+      "name": "audit_logs",
+      "type": "base",
+      "schema": [
+        {
+          "id": "action",
+          "name": "action",
+          "type": "select",
+          "required": true,
+          "options": {
+            "values": ["create", "update", "delete", "override"]
+          }
+        },
+        {
+          "id": "entity_type",
+          "name": "entity_type",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "entity_id",
+          "name": "entity_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "changes",
+          "name": "changes",
+          "type": "json"
+        },
+        {
+          "id": "performed_by",
+          "name": "performed_by",
+          "type": "relation"
+        },
+        {
+          "id": "performed_at",
+          "name": "performed_at",
+          "type": "date",
+          "required": true
+        },
+        {
+          "id": "ip_address",
+          "name": "ip_address",
+          "type": "text"
+        },
+        {
+          "id": "business_id",
+          "name": "business_id",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "businesses"
+          }
+        }
+      ]
+    }
+  ]
+}

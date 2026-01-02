@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    container_name: ndis-pocketbase
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./pb_data:/pb_data
+      - ./pb_public:/pb_public
+    environment:
+      - GO_ENV=production
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8090/api/health || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Python Services
+  schads-engine:
+    build:
+      context: ../python-services/schads-engine
+      dockerfile: Dockerfile
+    container_name: ndis-schads-engine
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+    depends_on:
+      - pocketbase
+
+  matching-engine:
+    build:
+      context: ../python-services/matching-engine
+      dockerfile: Dockerfile
+    container_name: ndis-matching-engine
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+    depends_on:
+      - pocketbase
