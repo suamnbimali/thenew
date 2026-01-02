@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PocketBase Backend Database
   pocketbase:
@@ -21,6 +19,7 @@ services:
     networks:
       - ndis-network
 
+
   # SCHADS Award Engine
   schads-engine:
     build:
@@ -39,6 +38,7 @@ services:
         condition: service_healthy
     networks:
       - ndis-network
+
 
   # AI Matching Engine
   matching-engine:
@@ -79,9 +79,11 @@ services:
     networks:
       - ndis-network
 
+
 networks:
   ndis-network:
     driver: bridge
+
 
 volumes:
   pb_data:
